@@ -8,31 +8,12 @@ on:
 
 jobs:
 
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Install OTP and Elixir
-        uses: actions/setup-elixir@v1
-        with:
-          otp-version: 23.1.1
-          elixir-version: 1.11.0
-      - name: Restore dependencies cache
-        uses: actions/cache@v2
-        with:
-          path: deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-mix-
-      - name: Install dependencies
-        run: mix deps.get
-
   format:
     name: Format
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: ./.github/actions/setup
       - run: mix compile --warnings-as-errors
       - run: mix format --check-formatted
 
@@ -54,5 +35,6 @@ jobs:
           --health-retries 5
 
     steps:
-    - name: Run tests
-      run: mix test
+      - uses: ./.github/actions/setup
+      - name: Run tests
+        run: mix test
